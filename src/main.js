@@ -2,8 +2,8 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls";
 
 const sizes = {
-  width: 600,
-  height: 800,
+  width: window.innerWidth,
+  height: window.innerHeight,
 };
 
 //creating a instance for loading the texture using THREE.TextureLoader
@@ -39,19 +39,29 @@ const scene = new THREE.Scene();
 //const material = new THREE.MeshDepthMaterial(); //will simply color the geometry in white if its close to the near  and in black if its close to the far value of the camera
 
 //Now we using the fourth material which is called MeshNormalMaterial
-const material = new THREE.MeshLambertMaterial(); // this material will react to light
+//const material = new THREE.MeshLambertMaterial(); // this material will react to light
+
+//Now we using the fourth material which is called MeshPhongMaterial
+//const material = new THREE.MeshPhongMaterial(); //this material is similar to the MeshLambertMaterial but the strange pattern is less visible and you can also see the light reflection
+//material.shininess = 1000; //we can controls the light reflection with shininess and the color of this reflection with specular
+//material.specular = new THREE.Color(0x1188ff);
+
+//Now we are using fifth material which is called MeshToonMaterial
+const material = new THREE.MeshToonMaterial();
 
 //*
 //Lights:
 //*
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+
+//adding ambient light to the scene
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
 scene.add(ambientLight);
 
 //adding pointLight to the scene
-const pointLight = new THREE.PointLight(0xffffff, 0.5);
-pointLight.position.x = 2;
-pointLight.position.y = 3;
-pointLight.position.z = 4;
+const pointLight = new THREE.PointLight(0xffffff, 10);
+pointLight.position.x = 1;
+pointLight.position.y = 1;
+pointLight.position.z = 2;
 scene.add(pointLight);
 
 const plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
