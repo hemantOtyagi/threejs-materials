@@ -47,7 +47,7 @@ const scene = new THREE.Scene();
 //material.specular = new THREE.Color(0x1188ff);
 
 //Now we are using fifth material which is called MeshToonMaterial
-const material = new THREE.MeshToonMaterial();
+const material = new THREE.MeshToonMaterial(); // this is similar with the MeshLambertMaterial but with a cartoonish
 
 //*
 //Lights:
@@ -115,7 +115,7 @@ window.addEventListener("resize", () => {
 function animate() {
   controls.update(); // Required for damping effect
   renderer.render(scene, camera);
-  requestAnimationFrame(animate);
+  requestAnimationFrame(animate); //call the function for the next frame
 }
 animate();
 
