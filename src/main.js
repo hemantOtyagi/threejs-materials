@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls";
+import * as dat from "dat-gui";
 
 const sizes = {
   width: window.innerWidth,
@@ -9,14 +10,21 @@ const sizes = {
 //creating a instance for loading the texture using THREE.TextureLoader
 const textureLoader = new THREE.TextureLoader();
 //const colorTexture = textureLoader.load("./public/gradients/5.jpg");
-const colorTexture = textureLoader.load("./public/matcaps/3.png");
+const colorTexture = textureLoader.load("./public/gradients/5.jpg");
 
 //creating a scene
 const scene = new THREE.Scene();
 
 //*
+//Debug ui
+//*
+
+const gui = new dat.GUI(); //instantciating a object using dat.GUI class
+
+//*
 //Materials:
 //*
+
 //creating multiple objects using simple mesh basic material
 //const material = new THREE.MeshBasicMaterial({
 //map: colorTexture,  //here i combine both the texture and the color on the same Material using colorTexture  by map and color by Color class
@@ -47,7 +55,22 @@ const scene = new THREE.Scene();
 //material.specular = new THREE.Color(0x1188ff);
 
 //Now we are using fifth material which is called MeshToonMaterial
-const material = new THREE.MeshToonMaterial(); // this is similar with the MeshLambertMaterial but with a cartoonish
+//const material = new THREE.MeshToonMaterial(); // this is similar with the MeshLambertMaterial but with a cartoonish
+
+//Now we are using sixth material which is called MeshStandardMaterial
+const material = new THREE.MeshStandardMaterial(); //MeshStandardMaterial uses physically based rendering principles(PBR) it supports lights but with a more realistic algorithm and better parameters like roughness and metal-ness
+material.roughness = 0.45; // add roughness to the material
+material.metalness = 0.65; // also add some metallicity to the material
+
+material.gradientMap = colorTexture; //to add more steps to the coloration, you can use the gradientMap property and use the gradient texture
+//We see a gradient instead of a clear sepration because the gradient is small and the magFilter tries to fix it with mipmapping
+colorTexture.minFilter = THREE.NearestFilter;
+colorTexture.magFilter = THREE.NearestFilter;
+colorTexture.generateMipmaps = false;
+
+//using the gui instance of the dat.GUI to add controls
+gui.add(material, "metalness").min(0).max(1).step(0.0001);
+gui.add(material, "roughness").min(0).max(1).step(0.0001);
 
 //*
 //Lights:
