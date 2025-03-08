@@ -9,8 +9,23 @@ const sizes = {
 
 //creating a instance for loading the texture using THREE.TextureLoader
 const textureLoader = new THREE.TextureLoader();
+const cubeTextureLoader = new THREE.CubeTextureLoader();
 //const colorTexture = textureLoader.load("./public/gradients/5.jpg");
-const colorTexture = textureLoader.load("./public/gradients/5.jpg");
+const colorTexture = textureLoader.load("./public/door/color.jpg");
+const ambientOcclusionTexture = textureLoader.load(
+  "./public/door/ambientOcclusion.jpg",
+); //Texture for the shadows
+const doorHeightTexture = textureLoader.load("./public/door/height.jpg");
+const doorNormalTexture = textureLoader.load('../public/door/normal.jpg');
+const doorAplhaMapTexture = textureLoader.load('../public/door/alpha.jpg');
+const enviromentMapTexture = cubeTextureLoader.load([
+  '../public/environmentMaps/0/px.jpg',
+  '../public/environmentMaps/0/nx.jpg',
+  '../public/environmentMaps/0/py.jpg',
+  '../public/environmentMaps/0/ny.jpg',
+  '../public/environmentMaps/0/pz.jpg',
+  '../public/environmentMaps/0/nz.jpg',
+]) 
 
 //creating a scene
 const scene = new THREE.Scene();
@@ -59,8 +74,6 @@ const gui = new dat.GUI(); //instantciating a object using dat.GUI class
 
 //Now we are using sixth material which is called MeshStandardMaterial
 const material = new THREE.MeshStandardMaterial(); //MeshStandardMaterial uses physically based rendering principles(PBR) it supports lights but with a more realistic algorithm and better parameters like roughness and metal-ness
-material.roughness = 0.45; // add roughness to the material
-material.metalness = 0.65; // also add some metallicity to the material
 
 material.gradientMap = colorTexture; //to add more steps to the coloration, you can use the gradientMap property and use the gradient texture
 //We see a gradient instead of a clear sepration because the gradient is small and the magFilter tries to fix it with mipmapping
@@ -71,6 +84,30 @@ colorTexture.generateMipmaps = false;
 //using the gui instance of the dat.GUI to add controls
 gui.add(material, "metalness").min(0).max(1).step(0.0001);
 gui.add(material, "roughness").min(0).max(1).step(0.0001);
+gui.add(material, "aoMapIntensity").min(1).max(20).step(0.5);
+gui.add(material, "displacementScale").min(0).max(1).step(0.005);
+
+//*
+//Map
+//*
+
+//Alsoo map allow you to add textures on the material using material.map property
+//aoMap("ambient occlusion map") will add shadows  where the texture is dark
+//UV-Coordinates  two-dimensional (2D) references that specify where to apply textures to 3D models.
+//material.roughness = 0.45; // add roughness to the material
+//material.metalness = 0.65; // also add some metallicity to the material
+//material.map = colorTexture;
+//material.aoMap = ambientOcclusionTexture;
+//material.aoMapIntensity = 5;
+//material.displacementMap = doorHeightTexture;
+//material.normalMap = doorNormalTexture;
+//material.normalScale.set(0.5, 0,5);
+//material.transparent = true;
+//material.alphaMap = doorAplhaMapTexture;
+material.envMap = enviromentMapTexture;
+material.roughness = 0.2; // add roughness to the material
+material.metalness = 0.7; // also add some metallicity to the material
+
 
 //*
 //Lights:
@@ -87,12 +124,25 @@ pointLight.position.y = 1;
 pointLight.position.z = 2;
 scene.add(pointLight);
 
-const plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
-const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), material);
+const plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 100, 100), material);
+plane.geometry.setAttribute(
+  "uv2",
+  new THREE.BufferAttribute(plane.geometry.attributes.uv.array, 2),
+); //setting up the uv2 attribute to the plane geometry using its uv parameters
+const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 64, 64), material);
+sphere.geometry.setAttribute(
+  "uv2",
+  new THREE.BufferAttribute(sphere.geometry.attributes.uv.array, 2),
+); //setting up the uv2 attribute to the sphere geometry using its uv parameters
 const torus = new THREE.Mesh(
   new THREE.TorusGeometry(0.3, 0.2, 16, 32),
   material,
 );
+torus.geometry.setAttribute(
+  "uv2",
+  new THREE.BufferAttribute(torus.geometry.attributes.uv.array, 2),
+); //setting up the uv2 attribute to the torus geometry using its uv parameters
+
 sphere.position.x = -1.5;
 torus.position.x = 1.5;
 scene.add(sphere, plane, torus);
@@ -148,13 +198,13 @@ const tick = () => {
   const elapsedTime = clock.getElapsedTime();
 
   //Update objects
-  sphere.rotation.x = elapsedTime * 0.5;
-  torus.rotation.x = elapsedTime * 0.5;
-  plane.rotation.x = elapsedTime * 0.5;
+  sphere.rotation.x = elapsedTime * 0.05;
+  torus.rotation.x = elapsedTime * 0.05;
+  plane.rotation.x = elapsedTime * 0.05;
 
-  sphere.rotation.y = elapsedTime * 0.5;
-  torus.rotation.y = elapsedTime * 0.5;
-  plane.rotation.y = elapsedTime * 0.5;
+  sphere.rotation.y = elapsedTime * 0.05;
+  torus.rotation.y = elapsedTime * 0.05;
+  plane.rotation.y = elapsedTime * 0.05;
 
   //Update controls
   controls.update();
